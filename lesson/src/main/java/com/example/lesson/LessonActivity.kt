@@ -14,26 +14,35 @@ import com.example.core.BaseView
 import com.example.lesson.entity.Lesson
 
 class LessonActivity : AppCompatActivity(), BaseView<LessonPresenter?>, Toolbar.OnMenuItemClickListener {
-    private val lessonPresenter = LessonPresenter(this)
-    override val presenter: LessonPresenter?
-        get() = lessonPresenter
+    override val presenter: LessonPresenter by lazy {
+        LessonPresenter(this)
+    }
+
 
     private val lessonAdapter = LessonAdapter()
     private lateinit var refreshLayout: SwipeRefreshLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lesson)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.inflateMenu(R.menu.menu_lesson)
-        toolbar.setOnMenuItemClickListener(this)
-        val recyclerView = findViewById<RecyclerView>(R.id.list)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = lessonAdapter
-        recyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayout.VERTICAL))
-        refreshLayout = findViewById(R.id.swipe_refresh_layout)
-        refreshLayout.setOnRefreshListener(OnRefreshListener { presenter?.fetchData() })
-        refreshLayout.isRefreshing = true
-        presenter?.fetchData()
+
+        findViewById<Toolbar>(R.id.toolbar).apply {
+            inflateMenu(R.menu.menu_lesson)
+            setOnMenuItemClickListener(this@LessonActivity)
+        }
+
+        findViewById<RecyclerView>(R.id.list).apply {
+            layoutManager = LinearLayoutManager(this@LessonActivity)
+            adapter = lessonAdapter
+            addItemDecoration(DividerItemDecoration(this@LessonActivity, LinearLayout.VERTICAL))
+        }
+
+
+        refreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout).apply {
+            setOnRefreshListener { presenter.fetchData() }
+            isRefreshing = true
+        }
+
+        presenter.fetchData()
     }
 
     fun showResult(lessons: List<Lesson>) {
@@ -42,7 +51,7 @@ class LessonActivity : AppCompatActivity(), BaseView<LessonPresenter?>, Toolbar.
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        presenter?.showPlayback()
+        presenter.showPlayback()
         return false
     }
 

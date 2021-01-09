@@ -16,17 +16,11 @@ class LessonAdapter : RecyclerView.Adapter<LessonViewHolder>() {
         notifyDataSetChanged()
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+    override fun getItemCount() = list.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LessonViewHolder {
-        return LessonViewHolder.onCreate(parent)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = LessonViewHolder.onCreate(parent)
 
-    override fun onBindViewHolder(holder: LessonViewHolder, position: Int) {
-        holder.onBind(list[position])
-    }
+    override fun onBindViewHolder(holder: LessonViewHolder, position: Int) = holder.onBind(list[position])
 
     /**
      * 静态内部类
@@ -35,22 +29,24 @@ class LessonAdapter : RecyclerView.Adapter<LessonViewHolder>() {
         fun onBind(lesson: Lesson) {
             setText(R.id.tv_date, lesson.date)
             setText(R.id.tv_content, lesson.content)
-            setText(R.id.tv_state, lesson.state.stateName())
-            val colorRes = when (lesson.state) {
-                Lesson.State.PLAYBACK -> R.color.playback
-                Lesson.State.LIVE -> R.color.live
-                Lesson.State.WAIT -> R.color.wait
+
+            lesson.state?.let {
+
+                setText(R.id.tv_state, it.stateName())
+
+                val colorRes = when (it) {
+                    Lesson.State.PLAYBACK -> R.color.playback
+                    Lesson.State.LIVE -> R.color.live
+                    Lesson.State.WAIT -> R.color.wait
+                }
+                getView<View>(R.id.tv_state)?.setBackgroundColor(itemView.context.getColor(colorRes))
             }
-            val backgroundColor = itemView.context.getColor(colorRes)
-            getView<View>(R.id.tv_state)?.setBackgroundColor(backgroundColor)
         }
 
         companion object {
-            fun onCreate(parent: ViewGroup): LessonViewHolder {
-                return LessonViewHolder(LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.item_lesson, parent, false))
-            }
+            fun onCreate(parent: ViewGroup): LessonViewHolder = LessonViewHolder(LayoutInflater
+                    .from(parent.context)
+                    .inflate(R.layout.item_lesson, parent, false))
         }
     }
 }

@@ -10,10 +10,7 @@ class BaseApplication : Application() {
     }
 
     companion object {
-        private var currentApplication: Context? = null
-        @JvmStatic
-        fun currentApplication(): Context {
-            return currentApplication!!
-        }
+        lateinit var currentApplication: Context
+            private set
     }
 }
